@@ -1,8 +1,10 @@
+
+
 //The DIY Life
 //Michael Klements
 //29 June 2020
 
-#include <AFMotor.h>                              //Import library to control motor shield
+#include <AFMotor.h>                        //Import library to control motor shield
 #include <Servo.h>                                //Import library to control the servo
 
 AF_DCMotor rightBack(1);                          //Create an object to control each motor
@@ -11,15 +13,15 @@ AF_DCMotor leftFront(3);
 AF_DCMotor leftBack(4);
 Servo servoLook;                                  //Create an object to control the servo
 
-byte trig = 2;                                    //Assign the ultrasonic sensor pins
-byte echo = 13;
+byte trig = A0;                                    //Assign the ultrasonic sensor pins
+byte echo = A2;
 byte maxDist = 150;                               //Maximum sensing distance (Objects further than this distance are ignored)
 byte stopDist = 50;                               //Minimum distance from an object to stop in cm
 float timeOut = 2*(maxDist+10)/100/340*1000000;   //Maximum time to wait for a return signal
 
-byte motorSpeed = 55;                             //The maximum motor speed
+byte motorSpeed = 200;                             //The maximum motor speed
 int motorOffset = 10;                             //Factor to account for one side being more powerful
-int turnSpeed = 50;                               //Amount to add to motor speed when turning
+int turnSpeed = 100;                               //Amount to add to motor speed when turning
 
 
 void setup() 
@@ -170,7 +172,7 @@ int checkDirection()                                            //Check the left
   servoLook.write(180);                                         //Turn servo to look left
   delay(500);
   distances [0] = getDistance();                                //Get the left object distance
-  servoLook.write(0);                                           //Turn servo to look right
+  servoLook.write(90);                                           //Turn servo to look right
   delay(1000);
   distances [1] = getDistance();                                //Get the right object distance
   if (distances[0]>=200 && distances[1]>=200)                   //If both directions are clear, turn left
