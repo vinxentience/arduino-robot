@@ -18,3 +18,9 @@ const int PIN_RIGHT_BLUE = 11;
 
 const int PIN_LEFT_RGB[3] = {PIN_LEFT_RED, PIN_LEFT_GREEN, PIN_LEFT_BLUE};
 const int PIN_RIGHT_RGB[3] = {PIN_RIGHT_RED, PIN_RIGHT_GREEN, PIN_RIGHT_BLUE};
+
+typedef enum
+{
+    LEFT,
+    RIGHT,
+} position;
