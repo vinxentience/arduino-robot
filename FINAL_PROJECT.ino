@@ -1,18 +1,18 @@
 #include "Constants.h"
 
+// #include <NewTone.h>
 #include <Servo.h>
 #include <AFMotor.h>
+#include <NewPing.h>
 
 #define MAX_DISTANCE 200
-#define MAX_SPEED 100 // sets speed of DC  motors
+#define MAX_SPEED 150 // sets speed of DC  motors
 #define MAX_SPEED_OFFSET 20
 
-AF_DCMotor leftMotor(1);
-AF_DCMotor rightMotor(3);
+AF_DCMotor leftMotor(1, MOTOR12_1KHZ);
+AF_DCMotor rightMotor(3, MOTOR12_1KHZ);
 
-boolean goesForward = false;
-int distance = 100;
-int speedSet = 0;
+NewPing sonar(PIN_TRIG, PIN_ECHO, MAX_DISTANCE);
 
 Servo servo;
 
@@ -31,6 +31,8 @@ void setup()
 
     leftMotor.setSpeed(MAX_SPEED);
     rightMotor.setSpeed(MAX_SPEED);
+
+    delay(500);
 }
 
 void loop()
@@ -41,16 +43,16 @@ void loop()
     delay(40);
 
     ultraSonicDistance = lookForward();
+    delay(100);
+    Serial.print("Distance: ");
+    Serial.print(ultraSonicDistance);
+    Serial.println(" cm");
 
     if (ultraSonicDistance <= 15)
     {
 
         moveStop();
-        delay(100);
-        moveBackward();
         delay(300);
-        moveStop();
-        delay(200);
 
         playBuzzer();
 
@@ -79,34 +81,23 @@ void loop()
 
 void playBuzzer()
 {
-    tone(PIN_BUZZER, 1500, 300);
-    delay(500);
-    // tone(PIN_BUZZER, 500, 300);
+    // NewTone(PIN_BUZZER, 1500, 300);
     // delay(500);
-    // tone(PIN_BUZZER, 1500, 300);
+    // NewTone(PIN_BUZZER, 500, 300);
+    // delay(500);
+    // NewTone(PIN_BUZZER, 1500, 300);
     // delay(300);
 }
 
 int readDistance()
 {
-    // Clears the trigPin condition
-    digitalWrite(PIN_TRIG, LOW);
-    delayMicroseconds(2);
-    // Sets the trigPin HIGH (ACTIVE) for 10 microseconds
-    digitalWrite(PIN_TRIG, HIGH);
-    delayMicroseconds(10);
-    digitalWrite(PIN_TRIG, LOW);
-    // Reads the echoPin, returns the sound wave travel time in microseconds
-    int duration = pulseIn(PIN_ECHO, HIGH);
-
-    return duration * 0.034 / 2; // Speed of sound wave divided by 2 (go and back)
+    return sonar.ping_cm();
 }
 
 int lookForward()
 {
     servo.write(90);
     int value = readDistance();
-    readDistance();
 
     return value;
 }
@@ -115,7 +106,7 @@ int lookLeft()
 {
     servo.write(180);
     int value = readDistance();
-    readDistance();
+    delay(500);
     servo.write(90);
 
     return value;
@@ -124,9 +115,8 @@ int lookLeft()
 int lookRight()
 {
     servo.write(0);
-
     int value = readDistance();
-    readDistance();
+    delay(500);
     servo.write(90);
 
     return value;
@@ -145,20 +135,13 @@ void moveForward()
 {
     Serial.println("Move Forward");
 
-    if (!goesForward)
-    {
-        goesForward = true;
-
-        leftMotor.run(FORWARD);
-        rightMotor.run(FORWARD);
-    }
+    leftMotor.run(FORWARD);
+    rightMotor.run(FORWARD);
 }
 
 void moveBackward()
 {
     Serial.println("Move Backward");
-
-    goesForward = false;
 
     leftMotor.run(BACKWARD);
     rightMotor.run(BACKWARD);
